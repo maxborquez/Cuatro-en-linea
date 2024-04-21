@@ -1,3 +1,5 @@
+// Client side C program to demonstrate Socket
+// programming
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
@@ -28,6 +30,8 @@ int main(int argc, char const *argv[])
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
 
+    // Convert IPv4 and IPv6 addresses from text to binary
+    // form
     if (inet_pton(AF_INET, argv[1], &serv_addr.sin_addr) <= 0)
     {
         printf("\nInvalid address/ Address not supported \n");
@@ -39,15 +43,20 @@ int main(int argc, char const *argv[])
         printf("\nConnection Failed \n");
         return -1;
     }
+    
+    while(1) {
+        // Send message
+        printf("Enter a message: ");
+        fgets(message, 1024, stdin);
+        send(client_fd, message, strlen(message), 0);
+        printf("Message sent\n");
 
-    printf("Enter a message: ");
-    fgets(message, 1024, stdin);
-    send(client_fd, message, strlen(message), 0);
-    printf("Message sent\n");
+        // Read server response
+        valread = read(client_fd, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
+        printf("Server response: %s\n", buffer);
+    }
 
-    valread = read(client_fd, buffer, 1024 - 1); 
-    printf("Server response: %s\n", buffer);
-
+    // closing the connected socket
     close(client_fd);
     return 0;
 }
