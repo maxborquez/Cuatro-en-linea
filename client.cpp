@@ -1,3 +1,4 @@
+// client.cpp
 // Client side C program to demonstrate Socket
 // programming
 #include <arpa/inet.h>
@@ -51,12 +52,16 @@ int main(int argc, char const *argv[])
         send(client_fd, message, strlen(message), 0);
         printf("Message sent\n");
 
+        if (message[0] == 'Q') {
+            printf("Client disconnected\n");
+            close(client_fd);
+            break;
+        }
+
         // Read server response
         valread = read(client_fd, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
         printf("Server response: %s\n", buffer);
     }
 
-    // closing the connected socket
-    close(client_fd);
     return 0;
 }

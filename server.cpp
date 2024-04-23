@@ -1,7 +1,7 @@
 /*
- * testS.cpp
+ * server.cpp
  *
- * g++ -std=c++11 testS.cpp -o testS
+ * g++ -std=c++11 server.cpp -o server
  *
  */
 #include <sys/socket.h> // socket()
@@ -35,23 +35,22 @@ void jugar(int socket_cliente, struct sockaddr_in direccionCliente) {
         }
 
         //
-        switch (buffer[0]) {
-            case 'C':       // C columna
-                {
-                string line(&buffer[0]);
-                cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Columna: " << line[2] << endl;
-                send(socket_cliente, "ok\n", 3, 0);
-                break;
-                }
-            default:
-                // instrucción no reconocida.
-                send(socket_cliente, "error\n", 6, 0);
+        if (buffer[0] == 'c' && buffer[1] >= '1' && buffer[1] <= '7') {
+            cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Columna: " << buffer[1] << endl;
+            send(socket_cliente, "ok\n", 3, 0);
+        } else {
+            // instrucción no reconocida.
+            send(socket_cliente, "error\n", 6, 0);
         }
     }
 }
 //
 int main(int argc, char **argv) {
     //
+    if (argc < 2) {
+        cerr << "Usage: " << argv[0] << " <port>" << endl;
+        return 1;
+    }
     int port = atoi(argv[1]);
     int socket_server = 0;
     // socket address structures.
@@ -118,5 +117,3 @@ int main(int argc, char **argv) {
     //
     return 0;
 }
-
-
