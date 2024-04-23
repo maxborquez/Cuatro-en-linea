@@ -1,3 +1,5 @@
+// Client side C program to demonstrate Socket
+// programming
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <string.h>
@@ -47,6 +49,7 @@ int main(int argc, char const *argv[])
         printf("Enter a message: ");
         fgets(message, 1024, stdin);
         send(client_fd, message, strlen(message), 0);
+        printf("Message sent\n");
 
         // Read server response
         valread = read(client_fd, buffer, 1024 - 1); // subtract 1 for the null terminator at the end

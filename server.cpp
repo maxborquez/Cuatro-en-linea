@@ -1,106 +1,122 @@
-#include <arpa/inet.h>
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
+/*
+ * testS.cpp
+ *
+ * g++ -std=c++11 testS.cpp -o testS
+ *
+ */
+#include <sys/socket.h> // socket()
+#include <arpa/inet.h>  // hton*()
+#include <string.h>     // memset()
 #include <unistd.h>
-#include <pthread.h>
+#include <iostream>
+using namespace std;
+//
+void jugar(int socket_cliente, struct sockaddr_in direccionCliente) {
+    //
+    char buffer[1024];
+    memset(buffer, '\0', sizeof(char)*1024);
+    int n_bytes = 0;
 
-#define MAX_CLIENTS 2
+    //
+    char ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(direccionCliente.sin_addr), ip, INET_ADDRSTRLEN);
+    //
+    cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Nuevo jugador." << endl;
 
-void *handle_client(void *socket_desc) {
-    int client_fd = *(int *)socket_desc;
-    ssize_t valread;
-    char buffer[1024] = {0};
+    //
+    while ((n_bytes = recv(socket_cliente, buffer, 1024, 0))) {
+        buffer[n_bytes] = '\0';
 
-    while (1) {
-        valread = read(client_fd, buffer, 1024 - 1);
-        if (valread > 0) {
-            std::cout << "Mensaje recibido: " << buffer << std::endl;
-
-            // Send response to the client
-            const char *hello = "Mensaje recibido por el servidor";
-            send(client_fd, hello, strlen(hello), 0);
-        } else {
+        //
+        if (buffer[0] == 'Q') {
+            cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Sale del juego." << endl;
+            close(socket_cliente);
             break;
         }
-    }
 
-    // Closing the connected socket
-    close(client_fd);
-    free(socket_desc);
-    pthread_exit(NULL);
+        //
+        switch (buffer[0]) {
+            case 'C':       // C columna
+                {
+                string line(&buffer[0]);
+                cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Columna: " << line[2] << endl;
+                send(socket_cliente, "ok\n", 3, 0);
+                break;
+                }
+            default:
+                // instrucción no reconocida.
+                send(socket_cliente, "error\n", 6, 0);
+        }
+    }
 }
+//
+int main(int argc, char **argv) {
+    //
+    int port = atoi(argv[1]);
+    int socket_server = 0;
+    // socket address structures.
+    struct sockaddr_in direccionServidor, direccionCliente;
 
-int main(int argc, char const *argv[]) {
-    if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " <port>" << std::endl;
-        return -1;
-    }
-
-    int PORT = atoi(argv[1]);
-    int server_fd, new_socket, *new_client_socket;
-    struct sockaddr_in address;
-    int opt = 1;
-    socklen_t addrlen = sizeof(address);
-
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        std::cout << "Error creating listening socket" << std::endl;
+    // crea el socket.
+    /*
+     * domain:
+     *      AF_ LOCAL-> processes on the same host.
+     *      AF_INET -> processes on different hosts connected by IP (AF_INET->IPv4, AF_INET6->IPv6)
+     * type:
+     *      SOCK_STREAM: TCP (reliable, connection-oriented)
+     *      SOCK_DGRAM: UDP (unreliable, connectionless)
+     * protocol:
+     *      Protocol value for Internet Protocol(IP), which is 0.
+     */
+    cout << "Creating listening socket ...\n";
+    if ((socket_server = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        cout << "Error creating listening socket\n";
         exit(EXIT_FAILURE);
     }
 
-    // Forcefully attaching socket to the port
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
-        perror("setsockopt");
+    // configuracion de los atributos de la clase sockaddr_in.
+    cout << "Configuring socket address structure ...\n";
+    memset(&direccionServidor, 0, sizeof(direccionServidor));
+    direccionServidor.sin_family      = AF_INET;
+    direccionServidor.sin_addr.s_addr = htonl(INADDR_ANY);
+    direccionServidor.sin_port        = htons(port);
+
+    //
+    cout << "Binding socket ...\n";
+    if (bind(socket_server, (struct sockaddr *) &direccionServidor, sizeof(direccionServidor)) < 0) {
+        cout << "Error calling bind()\n";
         exit(EXIT_FAILURE);
     }
 
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
-
-    // Forcefully attaching socket to the port
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-        std::cout << "Error calling bind()" << std::endl;
+    //
+    cout << "Calling listening ...\n";
+    if (listen(socket_server, 1024) < 0) {
+        cout << "Error calling listen()\n";
         exit(EXIT_FAILURE);
     }
 
-    if (listen(server_fd, MAX_CLIENTS) < 0) {
-        std::cout << "Error calling listen()" << std::endl;
-        exit(EXIT_FAILURE);
-    }
+    // para obtener info del cliente.
+    socklen_t addr_size;
+    addr_size = sizeof(struct sockaddr_in);
 
-    std::cout << "\nNuevo juego inciado, esperando jugadores\n";
+    //
+    cout << "Waiting client request ...\n";
+    while (true) {
+        /*  Wait for a connection, then accept() it  */
+        int socket_cliente;
 
-    pthread_t thread_id[MAX_CLIENTS];
-    int i = 0;
-
-    while (1) {
-        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, &addrlen)) < 0) {
-            perror("accept");
+        //
+        if ((socket_cliente = accept(socket_server, (struct sockaddr *)&direccionCliente, &addr_size)) < 0) {
+            cout << "Error calling accept()\n";
             exit(EXIT_FAILURE);
         }
 
-        new_client_socket = (int *)malloc(1);
-        *new_client_socket = new_socket;
-
-        if (pthread_create(&thread_id[i++], NULL, handle_client, (void *)new_client_socket) < 0) {
-            perror("could not create thread");
-            return -1;
-        }
-
-        // Reset thread index when it reaches the maximum number of clients
-        if (i >= MAX_CLIENTS) {
-            i = 0;
-            while (i < MAX_CLIENTS) {
-                pthread_join(thread_id[i++], NULL);
-            }
-            i = 0;
-        }
+        //
+        jugar(socket_cliente, direccionCliente);
     }
 
-    // Closing the listening socket
-    close(server_fd);
+    //
     return 0;
 }
+
+
