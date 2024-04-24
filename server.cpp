@@ -4,13 +4,21 @@
  * g++ -std=c++11 -pthread server.cpp -o server
  *
  */
-#include <sys/socket.h> // socket()
-#include <arpa/inet.h>  // hton*()
-#include <string.h>     // memset()
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <string.h>
 #include <unistd.h>
 #include <iostream>
 #include <pthread.h>
+#include <cstdlib>
+#include <ctime>
+
 using namespace std;
+
+bool quienComienza() {
+    srand(time(NULL));
+    return rand() % 2;
+}
 
 void* jugar(void* args) {
     int socket_cliente = *((int*)args);
@@ -27,6 +35,10 @@ void* jugar(void* args) {
 
     cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Nuevo jugador." << endl;
 
+    bool server_starts = quienComienza();
+    const char *turn_msg = server_starts ? "Servidor comienza.\n" : "Jugador comienza.\n";
+    send(socket_cliente, turn_msg, strlen(turn_msg), 0);
+
     while ((n_bytes = recv(socket_cliente, buffer, 1024, 0))) {
         buffer[n_bytes] = '\0';
 
@@ -40,7 +52,6 @@ void* jugar(void* args) {
             cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Columna: " << buffer[1] << endl;
             send(socket_cliente, "ok\n", 3, 0);
         } else {
-            // instrucción no reconocida.
             send(socket_cliente, "error\n", 6, 0);
         }
     }
