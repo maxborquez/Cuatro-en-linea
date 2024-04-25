@@ -39,6 +39,11 @@ void* jugar(void* args) {
     const char *turn_msg = server_starts ? "Servidor comienza.\n" : "Jugador comienza.\n";
     send(socket_cliente, turn_msg, strlen(turn_msg), 0);
 
+    if (server_starts) {
+        const char *server_start_msg = "c1\n";
+        send(socket_cliente, server_start_msg, strlen(server_start_msg), 0);
+    }
+
     while ((n_bytes = recv(socket_cliente, buffer, 1024, 0))) {
         buffer[n_bytes] = '\0';
 
@@ -50,7 +55,11 @@ void* jugar(void* args) {
 
         if (buffer[0] == 'c' && buffer[1] >= '1' && buffer[1] <= '7') {
             cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Columna: " << buffer[1] << endl;
-            send(socket_cliente, "ok\n", 3, 0);
+
+            // Aquí se selecciona aleatoriamente una columna para el servidor
+            char server_move[4];
+            sprintf(server_move, "c%d\n", (rand() % 7) + 1);
+            send(socket_cliente, server_move, strlen(server_move), 0);
         } else {
             send(socket_cliente, "error\n", 6, 0);
         }

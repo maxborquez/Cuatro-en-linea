@@ -45,19 +45,23 @@ int main(int argc, char const *argv[])
     memset(buffer, 0, sizeof(buffer)); 
 
     while(1) {
-        printf("Enter a message: ");
-        fgets(message, 1024, stdin);
-        send(client_fd, message, strlen(message), 0);
+        if (message[0] != 'Q') {
+            printf("Enter a message: ");
+            fgets(message, 1024, stdin);
+            send(client_fd, message, strlen(message), 0);
 
-        if (message[0] == 'Q') {
-            printf("Client disconnected\n");
-            close(client_fd);
+            if (message[0] == 'Q') {
+                printf("Client disconnected\n");
+                close(client_fd);
+                break;
+            }
+
+            valread = read(client_fd, buffer, 1024 - 1);
+            printf("Server response: %s\n", buffer);
+            memset(buffer, 0, sizeof(buffer));
+        } else {
             break;
         }
-
-        valread = read(client_fd, buffer, 1024 - 1);
-        printf("Server response: %s\n", buffer);
-        memset(buffer, 0, sizeof(buffer));
     }
 
     return 0;
