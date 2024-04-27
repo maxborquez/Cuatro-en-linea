@@ -60,46 +60,44 @@ int main(int argc, char const *argv[]) {
     printf("%s", buffer);
     memset(buffer, 0, sizeof(buffer));
 
-    while(1) {
-        if (message[0] != 'Q') {
-            // Imprimir el tablero antes de que el cliente ingrese su movimiento
-            printBoard(board);
-            printf("Enter a message: ");
-            fgets(message, 1024, stdin);
-            send(client_fd, message, strlen(message), 0);
+   while(1) {
+    printf("Enter a message: ");
+    fgets(message, 1024, stdin);
 
-            if (message[0] == 'Q') {
-                printf("Client disconnected\n");
-                close(client_fd);
-                break;
-            }
-
-            // Actualizar el tablero local con el movimiento enviado por el cliente
-            int column_client = message[1] - '1';
-            for (int i = 0; i < 6; ++i) {
-                if (board[i][column_client] == ' ') {
-                    board[i][column_client] = 'C'; // 'C' indica movimiento del cliente
-                    break;
-                }
-            }
-
-            valread = read(client_fd, buffer, 1024 - 1);
-            // Actualizar el tablero local con el movimiento recibido del servidor
-            int column_server = buffer[1] - '1';
-            for (int i = 0; i < 6; ++i) {
-                if (board[i][column_server] == ' ') {
-                    board[i][column_server] = 'S'; // 'S' indica movimiento del servidor
-                    break;
-                }
-            }
-            // Imprimir el tablero actualizado
-            printBoard(board);
-            printf("Server response: %s\n", buffer);
-            memset(buffer, 0, sizeof(buffer));
-        } else {
+    // Actualizar el tablero local con el movimiento del cliente
+    int column_client = message[1] - '1';
+    for (int i = 0; i < 6; ++i) {
+        if (board[i][column_client] == ' ') {
+            board[i][column_client] = 'C'; // 'C' indica movimiento del cliente
             break;
         }
     }
+
+    send(client_fd, message, strlen(message), 0);
+
+    if (message[0] == 'Q') {
+        printf("Client disconnected\n");
+        close(client_fd);
+        break;
+    }
+
+    valread = read(client_fd, buffer, 1024 - 1);
+    // Actualizar el tablero local con el movimiento recibido del servidor
+    int column_server = buffer[1] - '1';
+    for (int i = 0; i < 6; ++i) {
+        if (board[i][column_server] == ' ') {
+            board[i][column_server] = 'S'; // 'S' indica movimiento del servidor
+            break;
+        }
+    }
+
+    // Imprimir el tablero después de recibir la respuesta del servidor
+    printf("Server response: %s\n", buffer);
+    printBoard(board);
+    memset(buffer, 0, sizeof(buffer));
+}
+
+
 
     return 0;
 }
