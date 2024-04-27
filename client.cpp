@@ -8,7 +8,7 @@
 // Función para imprimir el tablero
 void printBoard(char board[6][7]) {
     std::cout << "TABLERO" << std::endl;
-    for (int i = 0; i < 6; ++i) {
+    for (int i = 5; i >= 0; --i) { // Invertimos el orden de las filas
         for (int j = 0; j < 7; ++j) {
             std::cout << board[i][j] << " ";
         }
@@ -17,7 +17,6 @@ void printBoard(char board[6][7]) {
     std::cout << "-------------" << std::endl;
     std::cout << "1 2 3 4 5 6 7" << std::endl;
 }
-
 
 int main(int argc, char const *argv[]) {
     if (argc < 3) {
