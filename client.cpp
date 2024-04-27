@@ -5,10 +5,9 @@
 #include <unistd.h>
 #include <iostream>
 
-// Función para imprimir el tablero
 void printBoard(char board[6][7]) {
     std::cout << "TABLERO" << std::endl;
-    for (int i = 5; i >= 0; --i) { // Invertimos el orden de las filas
+    for (int i = 5; i >= 0; --i) {
         for (int j = 0; j < 7; ++j) {
             std::cout << board[i][j] << " ";
         }
@@ -30,7 +29,7 @@ int main(int argc, char const *argv[]) {
     char buffer[1024] = {0};
     char message[1024];
 
-    // Inicializar el tablero vacío
+
     char board[6][7];
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < 7; ++j) {
@@ -60,44 +59,40 @@ int main(int argc, char const *argv[]) {
     printf("%s", buffer);
     memset(buffer, 0, sizeof(buffer));
 
-   while(1) {
-    printf("Enter a message: ");
-    fgets(message, 1024, stdin);
+    while(1) {
+        printf("Enter a message: ");
+        fgets(message, 1024, stdin);
 
-    // Actualizar el tablero local con el movimiento del cliente
-    int column_client = message[1] - '1';
-    for (int i = 0; i < 6; ++i) {
-        if (board[i][column_client] == ' ') {
-            board[i][column_client] = 'C'; // 'C' indica movimiento del cliente
+        int column_client = message[1] - '1';
+        for (int i = 0; i < 6; ++i) {
+            if (board[i][column_client] == ' ') {
+                board[i][column_client] = 'C';
+                break;
+            }
+        }
+
+        send(client_fd, message, strlen(message), 0);
+
+        if (message[0] == 'Q') {
+            printf("Client disconnected\n");
+            close(client_fd);
             break;
         }
-    }
 
-    send(client_fd, message, strlen(message), 0);
+        valread = read(client_fd, buffer, 1024 - 1);
 
-    if (message[0] == 'Q') {
-        printf("Client disconnected\n");
-        close(client_fd);
-        break;
-    }
-
-    valread = read(client_fd, buffer, 1024 - 1);
-    // Actualizar el tablero local con el movimiento recibido del servidor
-    int column_server = buffer[1] - '1';
-    for (int i = 0; i < 6; ++i) {
-        if (board[i][column_server] == ' ') {
-            board[i][column_server] = 'S'; // 'S' indica movimiento del servidor
-            break;
+        int column_server = buffer[1] - '1';
+        for (int i = 0; i < 6; ++i) {
+            if (board[i][column_server] == ' ') {
+                board[i][column_server] = 'S';
+                break;
+            }
         }
+
+        printf("Server response: %s\n", buffer);
+        printBoard(board);
+        memset(buffer, 0, sizeof(buffer));
     }
-
-    // Imprimir el tablero después de recibir la respuesta del servidor
-    printf("Server response: %s\n", buffer);
-    printBoard(board);
-    memset(buffer, 0, sizeof(buffer));
-}
-
-
 
     return 0;
 }
