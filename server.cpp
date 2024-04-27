@@ -40,9 +40,11 @@ void* jugar(void* args) {
     send(socket_cliente, turn_msg, strlen(turn_msg), 0);
 
     if (server_starts) {
-        const char *server_start_msg = "c1\n";
+        char server_start_msg[4];
+        sprintf(server_start_msg, "c%d\n", (rand() % 7) + 1);
         send(socket_cliente, server_start_msg, strlen(server_start_msg), 0);
     }
+
 
     while ((n_bytes = recv(socket_cliente, buffer, 1024, 0))) {
         buffer[n_bytes] = '\0';
