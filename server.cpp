@@ -55,15 +55,15 @@ void* jugar(void* args) {
 
 int main(int argc, char **argv) {
     if (argc < 2) {
-        cerr << "Usage: " << argv[0] << " <port>" << endl;  // Verificar que se haya proporcionado el puerto.
+        cout << "Usage: " << argv[0] << " <port>" << endl;  // Verificar que se haya proporcionado el puerto.
         return 1;
     }
 
-    cout << "Calling listening ...\n";
+    cout << "Calling listening ...\n" << std::endl;
     int port = atoi(argv[1]);  // Convertir el puerto a entero.
     int socket_server = socket(AF_INET, SOCK_STREAM, 0);  // Crear socket de servidor
     if (socket_server < 0) {
-        cerr << "Error creating listening socket\n";
+        cout << "Error creating listening socket\n" << endl;
         return 1;
     }
 
@@ -74,16 +74,16 @@ int main(int argc, char **argv) {
     direccionServidor.sin_port = htons(port);
 
     if (bind(socket_server, (struct sockaddr *) &direccionServidor, sizeof(direccionServidor)) < 0) {
-        cerr << "Error calling bind()\n";  // Enlazar socket
+        cout << "Error calling bind()\n" << endl;  // Enlazar socket
         return 1;
     }
 
     if (listen(socket_server, 1024) < 0) {
-        cerr << "Error calling listen()\n";  // Poner el servidor a escuchar conexiones
+        cout << "Error calling listen()\n" << endl;  // Poner el servidor a escuchar conexiones
         return 1;
     }
 
-    cout << "Waiting client request ...\n";
+    cout << "Waiting client request ...\n" << std::endl;
     struct sockaddr_in direccionCliente;
     socklen_t addr_size = sizeof(struct sockaddr_in);
 
@@ -91,14 +91,14 @@ int main(int argc, char **argv) {
         int* socket_cliente = (int*)malloc(sizeof(int));  // Reservar memoria para socket del cliente
         *socket_cliente = accept(socket_server, (struct sockaddr *)&direccionCliente, &addr_size);  // Aceptar conexión entrante
         if (*socket_cliente < 0) {
-            cerr << "Error calling accept()\n";
+            cout << "Error calling accept()\n" << endl;
             free(socket_cliente);
             continue;
         }
 
         pthread_t thread_id;  // Crear hilos para permitir multiples conexiones
         if (pthread_create(&thread_id, NULL, jugar, (void*)socket_cliente) < 0) {
-            cerr << "Error creating thread\n";
+            cout << "Error creating thread\n" << endl;
             close(*socket_cliente);
             free(socket_cliente);
             continue;
