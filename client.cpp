@@ -4,7 +4,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <iostream>
-#include <ctype.h> // Necesario para la función tolower
+#include <ctype.h>
 
 void printBoard(char board[6][7]) {
     std::cout << "TABLERO" << std::endl;
