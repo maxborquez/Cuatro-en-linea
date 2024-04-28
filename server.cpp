@@ -11,14 +11,8 @@
 #include <iostream>
 #include <pthread.h>
 #include <cstdlib>
-#include <ctime>
 
 using namespace std;
-
-bool quienComienza() {
-    srand(time(NULL));
-    return rand() % 2;
-}
 
 void* jugar(void* args) {
     int socket_cliente = *((int*)args);
@@ -35,16 +29,8 @@ void* jugar(void* args) {
 
     cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Nuevo jugador." << endl;
 
-    bool server_starts = quienComienza();
-    const char *turn_msg = server_starts ? "Servidor comienza.\n" : "Jugador comienza.\n";
+    const char *turn_msg = "Jugador comienza.\n";
     send(socket_cliente, turn_msg, strlen(turn_msg), 0);
-
-    if (server_starts) {
-        char server_start_msg[4];
-        sprintf(server_start_msg, "c%d\n", (rand() % 7) + 1);
-        send(socket_cliente, server_start_msg, strlen(server_start_msg), 0);
-    }
-
 
     while ((n_bytes = recv(socket_cliente, buffer, 1024, 0))) {
         buffer[n_bytes] = '\0';
