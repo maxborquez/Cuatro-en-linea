@@ -1,9 +1,10 @@
 # Cuatro-en-linea
 
-Cuatro en Lınea es un juego de mesa para dos jugadores distribuido por Hasbro, en el que se introducen fichas en un tablero vertical con el objetivo de alinear cuatro fichas consecutivas de un mismo color sobre un tablero formado por seis filas y siete columnas. 
-Cada jugador dispone de 21 fichas de un color (por lo general, rojas o amarillas). 
-Por turnos, los jugadores deben introducir una ficha en la columna que prefieran (siempre que no este completa) y esta caera a la posicion mas baja. Gana la partida el primero que consiga alinear cuatro fichas consecutivas de
-un mismo color en horizontal, vertical o diagonal. Si todas las columnas estan llenas pero nadie ha hecho una fila valida, hay empate.
+Cuatro en Lınea es un juego de mesa para dos jugadores distribuido por Hasbro, en el que se introducen fichas en un tablero vertical con el objetivo de alinear cuatro fichas consecutivas de un mismo color sobre un tablero formado por seis filas y siete columnas. <br>
+Cada jugador dispone de 21 fichas de un color (por lo general, rojas o amarillas). <br>
+Por turnos, los jugadores deben introducir una ficha en la columna que prefieran (siempre que no este completa) y esta caera a la posicion mas baja. <br>
+Gana la partida el primero que consiga alinear cuatro fichas consecutivas de un mismo color en horizontal, vertical o diagonal. <br>
+Si todas las columnas estan llenas pero nadie ha hecho una fila valida, hay empate.<br>
 
 ## Instrucciones:
 
