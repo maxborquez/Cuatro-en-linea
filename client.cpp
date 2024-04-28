@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <iostream>
+#include <ctype.h> // Necesario para la función tolower
 
 void printBoard(char board[6][7]) {
     std::cout << "TABLERO" << std::endl;
@@ -15,6 +16,10 @@ void printBoard(char board[6][7]) {
     }
     std::cout << "-------------" << std::endl;
     std::cout << "1 2 3 4 5 6 7" << std::endl;
+}
+
+bool isColumnFull(char board[6][7], int column) {
+    return board[5][column] != ' ';
 }
 
 int main(int argc, char const *argv[]) {
@@ -59,11 +64,26 @@ int main(int argc, char const *argv[]) {
     printf("%s", buffer);
     memset(buffer, 0, sizeof(buffer));
 
-    while(1) {
+   while(1) {
         printf("Enter a message: ");
         fgets(message, 1024, stdin);
 
+        // Convertir el primer carácter a minúscula antes de comparar
+        message[0] = tolower(message[0]);
+
+        if (message[0] == 'q') { // Comparar con 'q' en minúscula
+            printf("Client disconnected\n");
+            close(client_fd);
+            break;
+        }
+
         int column_client = message[1] - '1';
+
+        if (isColumnFull(board, column_client)) {
+            printf("Columna %d esta llena. Elige otra columna.\n", column_client + 1);
+            continue;
+        }
+
         for (int i = 0; i < 6; ++i) {
             if (board[i][column_client] == ' ') {
                 board[i][column_client] = 'C';
@@ -72,12 +92,6 @@ int main(int argc, char const *argv[]) {
         }
 
         send(client_fd, message, strlen(message), 0);
-
-        if (message[0] == 'Q') {
-            printf("Client disconnected\n");
-            close(client_fd);
-            break;
-        }
 
         valread = read(client_fd, buffer, 1024 - 1);
 
@@ -93,6 +107,7 @@ int main(int argc, char const *argv[]) {
         printBoard(board);
         memset(buffer, 0, sizeof(buffer));
     }
+
 
     return 0;
 }
