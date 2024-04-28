@@ -139,10 +139,15 @@ int main(int argc, char const *argv[]) {
             continue;
         }
 
+        if (message[1] < '1' || message[1] > '7') {
+            printf("Entrada inválida. Elige un número de columna entre 1 y 7.\n");
+            continue;
+        }
+
         int column_client = message[1] - '1';
 
         if (isColumnFull(board, column_client)) {
-            printf("Columna %d esta llena. Elige otra columna.\n", column_client + 1);
+            printf("Columna %d está llena. Elige otra columna.\n", column_client + 1);
             continue;
         }
 
