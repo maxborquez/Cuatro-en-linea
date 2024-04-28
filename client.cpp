@@ -22,6 +22,67 @@ bool isColumnFull(char board[6][7], int column) {
     return board[5][column] != ' ';
 }
 
+bool checkWin(char board[6][7], char player) {
+    // Verificar horizontalmente
+    for (int row = 0; row < 6; ++row) {
+        for (int col = 0; col < 4; ++col) {
+            if (board[row][col] == player &&
+                board[row][col + 1] == player &&
+                board[row][col + 2] == player &&
+                board[row][col + 3] == player) {
+                return true;
+            }
+        }
+    }
+
+    // Verificar verticalmente
+    for (int col = 0; col < 7; ++col) {
+        for (int row = 0; row < 3; ++row) {
+            if (board[row][col] == player &&
+                board[row + 1][col] == player &&
+                board[row + 2][col] == player &&
+                board[row + 3][col] == player) {
+                return true;
+            }
+        }
+    }
+
+    // Verificar diagonalmente (ascendente)
+    for (int row = 3; row < 6; ++row) {
+        for (int col = 0; col < 4; ++col) {
+            if (board[row][col] == player &&
+                board[row - 1][col + 1] == player &&
+                board[row - 2][col + 2] == player &&
+                board[row - 3][col + 3] == player) {
+                return true;
+            }
+        }
+    }
+
+    // Verificar diagonalmente (descendente)
+    for (int row = 0; row < 3; ++row) {
+        for (int col = 0; col < 4; ++col) {
+            if (board[row][col] == player &&
+                board[row + 1][col + 1] == player &&
+                board[row + 2][col + 2] == player &&
+                board[row + 3][col + 3] == player) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool checkDraw(char board[6][7]) {
+    for (int col = 0; col < 7; ++col) {
+        if (board[5][col] == ' ') {
+            return false; // Todavía hay espacio en la columna, no hay empate
+        }
+    }
+    return true; // Todas las columnas están llenas, hay empate
+}
+
 int main(int argc, char const *argv[]) {
     if (argc < 3) {
         printf("Usage: %s <ip> <port>\n", argv[0]);
@@ -64,7 +125,7 @@ int main(int argc, char const *argv[]) {
     printf("%s", buffer);
     memset(buffer, 0, sizeof(buffer));
 
-   while(1) {
+    while(1) {
         printf("Enter a message: ");
         fgets(message, 1024, stdin);
 
@@ -93,6 +154,16 @@ int main(int argc, char const *argv[]) {
 
         send(client_fd, message, strlen(message), 0);
 
+        if (checkWin(board, 'C')) {
+            printBoard(board);
+            printf("\n¡Has ganado!\n");
+            break;
+        } else if (checkDraw(board)) {
+            printBoard(board);
+            printf("\n¡El juego está empatado!\n");
+            break;
+        }
+
         valread = read(client_fd, buffer, 1024 - 1);
 
         int column_server = buffer[1] - '1';
@@ -103,11 +174,20 @@ int main(int argc, char const *argv[]) {
             }
         }
 
+        if (checkWin(board, 'S')) {
+            printBoard(board);
+            printf("\nEl servidor ha ganado!\n");
+            break;
+        } else if (checkDraw(board)) {
+            printBoard(board);
+            printf("\n¡El juego está empatado!\n");
+            break;
+        }
+
         printf("Server response: %s\n", buffer);
         printBoard(board);
         memset(buffer, 0, sizeof(buffer));
     }
-
 
     return 0;
 }
