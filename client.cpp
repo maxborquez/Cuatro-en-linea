@@ -95,7 +95,6 @@ int main(int argc, char const *argv[]) {
     char buffer[1024] = {0};
     char message[1024];
 
-
     char board[6][7];
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < 7; ++j) {
@@ -129,13 +128,15 @@ int main(int argc, char const *argv[]) {
         printf("Enter a message: ");
         fgets(message, 1024, stdin);
 
-        // Convertir el primer carácter a minúscula antes de comparar
-        message[0] = tolower(message[0]);
-
-        if (message[0] == 'q') { // Comparar con 'q' en minúscula
+        if (message[0] == 'Q') { 
             printf("Client disconnected\n");
             close(client_fd);
             break;
+        }
+
+        if (message[0] == 'q') {
+            printf("Error: 'q' es un comando inválido.\n");
+            continue;
         }
 
         int column_client = message[1] - '1';
