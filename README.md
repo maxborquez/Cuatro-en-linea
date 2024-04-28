@@ -22,7 +22,9 @@ el cual se consulta con el comando "ip a" en la terminal del servidor
 Para jugar introduce el comando c + numero entre 1 y 7 por ejemplo:
 
 Jugador comienza.
+
 Enter a message: c1
+
 Server response: c3
 
 TABLERO
@@ -34,7 +36,9 @@ TABLERO
 C   S         
 -------------
 1 2 3 4 5 6 7
+
 Enter a message: c2
+
 Server response: c2
 
 TABLERO
@@ -46,7 +50,9 @@ TABLERO
 C C S         
 -------------
 1 2 3 4 5 6 7
+
 Enter a message: c1
+
 Server response: c4
 
 TABLERO
@@ -58,7 +64,9 @@ C S
 C C S S       
 -------------
 1 2 3 4 5 6 7
+
 Enter a message: c1
+
 Server response: c3
 
 TABLERO
@@ -70,7 +78,9 @@ C S S
 C C S S       
 -------------
 1 2 3 4 5 6 7
+
 Enter a message: c1
+
 TABLERO
               
               
