@@ -210,10 +210,14 @@ int main(int argc, char const *argv[]) {
 
         // Verificar si el cliente ha ganado
         if (verificarGanador(tablero, 'C')) {
-            cout << "\n¡Ha ganado!" << endl;
+            const char* mensaje = "\n¡Jugador ha ganado!";
+            send(socket_cliente, mensaje, strlen(mensaje), 0); // Enviar mensaje al servidor
+            cout << mensaje << endl;
             break;
         } else if (verificarEmpate(tablero)) {
-            cout << "\n¡El juego ha empatado!" << endl;
+            const char* mensaje = "\n¡El juego ha empatado!";
+            send(socket_cliente, mensaje, strlen(mensaje), 0); // Enviar mensaje al servidor
+            cout << mensaje << endl;
             break;
         }
 
@@ -233,10 +237,14 @@ int main(int argc, char const *argv[]) {
 
         // Verificar si el servidor ha ganado
         if (verificarGanador(tablero, 'S')) {
-            cout << "\nEl servidor ha ganado!" << endl;
+            const char* mensaje = "\nEl servidor ha ganado!";
+            send(socket_cliente, mensaje, strlen(mensaje), 0); // Enviar mensaje al servidor
+            cout << mensaje << endl;
             break;
         } else if (verificarEmpate(tablero)) {
-            cout << "\n¡El juego ha empatado!" << endl;
+            const char* mensaje = "\n¡El juego ha empatado!";
+            send(socket_cliente, mensaje, strlen(mensaje), 0); // Enviar mensaje al servidor
+            cout << mensaje << endl;
             break;
         }
 

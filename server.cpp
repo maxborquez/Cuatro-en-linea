@@ -35,6 +35,13 @@ void* jugar(void* args) {
             return NULL;
         }
 
+        // Revisar si el mensaje es "El servidor ha ganado!" o "¡El juego ha empatado!" o "¡Ha ganado!"
+        if (strstr(buffer, "ha ganado!") != NULL || strstr(buffer, "ha empatado!") != NULL) {
+            cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] " << buffer << endl;
+            close(socket_cliente);
+            return NULL;
+        }
+
         if (strcmp(buffer, "start\n") == 0) {  // Manejar el inicio del juego
             char movimiento_servidor[4];
             sprintf(movimiento_servidor, "c%d\n", (rand() % 7) + 1); // Generar movimiento aleatorio del servidor
@@ -46,7 +53,7 @@ void* jugar(void* args) {
         // Servidor genera su movimiento aleatorio si el cliente envía un movimiento válido
         if (buffer[0] == 'c' && buffer[1] >= '1' && buffer[1] <= '7') {
             // imprimir movimiento del cliente y su ip
-            cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Movimiento del jugador: " << buffer[1] << endl;
+            cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Movimiento del jugador: c" << buffer[1] << endl;
 
             char movimiento_servidor[4];
             sprintf(movimiento_servidor, "c%d\n", (rand() % 7) + 1); // Generar movimiento aleatorio del servidor
