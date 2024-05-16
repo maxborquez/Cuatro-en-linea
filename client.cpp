@@ -134,11 +134,7 @@ int main(int argc, char const *argv[]) {
     std::cout << "escribe c1,c2,c3,c4,c5,c6 o c7 para poner una ficha en una columna" << std::endl;
     std::cout << "escribe Q para salir del juego \n" << std::endl;
 
-    // Leer mensaje de bienvenida del servidor
-    valread = read(client_fd, buffer, 1024 - 1);
-    printf("%s", buffer);
-    memset(buffer, 0, sizeof(buffer));
-
+    
     std::cout << "\n" << std::endl;
 
     // Juego

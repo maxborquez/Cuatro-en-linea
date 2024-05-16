@@ -26,9 +26,6 @@ void* jugar(void* args) {
 
     cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Nuevo jugador." << endl;
 
-    const char *turn_msg = "Jugador comienza.\n";
-    send(socket_cliente, turn_msg, strlen(turn_msg), 0);  // Enviar mensaje inicial al client
-
     while ((n_bytes = recv(socket_cliente, buffer, 1024, 0)) > 0) {
         buffer[n_bytes] = '\0';  // Asegurar final del string
 
