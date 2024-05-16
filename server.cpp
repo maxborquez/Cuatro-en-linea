@@ -36,10 +36,10 @@ void* jugar(void* args) {
         }
 
         if (strcmp(buffer, "start\n") == 0) {  // Manejar el inicio del juego
-            char server_move[4];
-            sprintf(server_move, "c%d\n", (rand() % 7) + 1); // Generar movimiento aleatorio del servidor
-            cout << "Movimiento del servidor: " << server_move << endl;
-            send(socket_cliente, server_move, strlen(server_move), 0);  // Responder con movimiento del servidor
+            char movimiento_servidor[4];
+            sprintf(movimiento_servidor, "c%d\n", (rand() % 7) + 1); // Generar movimiento aleatorio del servidor
+            cout << "Movimiento del servidor: " << movimiento_servidor << endl;
+            send(socket_cliente, movimiento_servidor, strlen(movimiento_servidor), 0);  // Responder con movimiento del servidor
             continue;
         }
 
@@ -48,10 +48,10 @@ void* jugar(void* args) {
             // imprimir movimiento del cliente y su ip
             cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Movimiento del jugador: " << buffer[1] << endl;
 
-            char server_move[4];
-            sprintf(server_move, "c%d\n", (rand() % 7) + 1); // Generar movimiento aleatorio del servidor
-            cout << "Movimiento del servidor: " << server_move << endl;
-            send(socket_cliente, server_move, strlen(server_move), 0);  // Responder con movimiento del servidor
+            char movimiento_servidor[4];
+            sprintf(movimiento_servidor, "c%d\n", (rand() % 7) + 1); // Generar movimiento aleatorio del servidor
+            cout << "Movimiento del servidor: " << movimiento_servidor << endl;
+            send(socket_cliente, movimiento_servidor, strlen(movimiento_servidor), 0);  // Responder con movimiento del servidor
         } else {
             send(socket_cliente, "error\n", 6, 0);  // Enviar mensaje de error si el comando es inválido.
         }
@@ -74,13 +74,13 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    struct sockaddr_in direccionServidor;
-    memset(&direccionServidor, 0, sizeof(direccionServidor));  // Configurar dirección del servidor
-    direccionServidor.sin_family = AF_INET;
-    direccionServidor.sin_addr.s_addr = htonl(INADDR_ANY);
-    direccionServidor.sin_port = htons(port);
+    struct sockaddr_in serv_aadr;
+    memset(&serv_aadr, 0, sizeof(serv_aadr));  // Configurar dirección del servidor
+    serv_aadr.sin_family = AF_INET;
+    serv_aadr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_aadr.sin_port = htons(port);
 
-    if (bind(socket_server, (struct sockaddr *) &direccionServidor, sizeof(direccionServidor)) < 0) {
+    if (bind(socket_server, (struct sockaddr *) &serv_aadr, sizeof(serv_aadr)) < 0) {
         cout << "Error calling bind()\n" << endl;  // Enlazar socket
         return 1;
     }

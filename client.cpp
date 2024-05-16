@@ -7,33 +7,35 @@
 #include <ctime> // Para srand y rand
 #include <cstdlib>
 
+using namespace std;
+
 // Función para imprimir el tablero
-void printBoard(char board[6][7]) {
-    std::cout << "TABLERO" << std::endl;
+void imprimirTablero(char tablero[6][7]) {
+    cout << "TABLERO" << endl;
     for (int i = 5; i >= 0; --i) {
         for (int j = 0; j < 7; ++j) {
-            std::cout << board[i][j] << " ";
+            cout << tablero[i][j] << " ";
         }
-        std::cout << std::endl;
+        cout << endl;
     }
-    std::cout << "-------------" << std::endl;
-    std::cout << "1 2 3 4 5 6 7" << std::endl;
+    cout << "-------------" << endl;
+    cout << "1 2 3 4 5 6 7" << endl;
 }
 
 // Función para verificar si una columna está llena
-bool isColumnFull(char board[6][7], int column) {
-    return board[5][column] != ' ';
+bool columnaLlena(char tablero[6][7], int columna) {
+    return tablero[5][columna] != ' ';
 }
 
 // Función para verificar si un jugador ha ganado
-bool checkWin(char board[6][7], char player) {
+bool verificarGanador(char tablero[6][7], char jugador) {
     // Verificar horizontalmente
-    for (int row = 0; row < 6; ++row) {
+    for (int fila = 0; fila < 6; ++fila) {
         for (int col = 0; col < 4; ++col) {
-            if (board[row][col] == player &&
-                board[row][col + 1] == player &&
-                board[row][col + 2] == player &&
-                board[row][col + 3] == player) {
+            if (tablero[fila][col] == jugador &&
+                tablero[fila][col + 1] == jugador &&
+                tablero[fila][col + 2] == jugador &&
+                tablero[fila][col + 3] == jugador) {
                 return true;
             }
         }
@@ -41,35 +43,35 @@ bool checkWin(char board[6][7], char player) {
 
     // Verificar verticalmente
     for (int col = 0; col < 7; ++col) {
-        for (int row = 0; row < 3; ++row) {
-            if (board[row][col] == player &&
-                board[row + 1][col] == player &&
-                board[row + 2][col] == player &&
-                board[row + 3][col] == player) {
+        for (int fila = 0; fila < 3; ++fila) {
+            if (tablero[fila][col] == jugador &&
+                tablero[fila + 1][col] == jugador &&
+                tablero[fila + 2][col] == jugador &&
+                tablero[fila + 3][col] == jugador) {
                 return true;
             }
         }
     }
 
     // Verificar diagonalmente (ascendente)
-    for (int row = 3; row < 6; ++row) {
+    for (int fila = 3; fila < 6; ++fila) {
         for (int col = 0; col < 4; ++col) {
-            if (board[row][col] == player &&
-                board[row - 1][col + 1] == player &&
-                board[row - 2][col + 2] == player &&
-                board[row - 3][col + 3] == player) {
+            if (tablero[fila][col] == jugador &&
+                tablero[fila - 1][col + 1] == jugador &&
+                tablero[fila - 2][col + 2] == jugador &&
+                tablero[fila - 3][col + 3] == jugador) {
                 return true;
             }
         }
     }
 
     // Verificar diagonalmente (descendente)
-    for (int row = 0; row < 3; ++row) {
+    for (int fila = 0; fila < 3; ++fila) {
         for (int col = 0; col < 4; ++col) {
-            if (board[row][col] == player &&
-                board[row + 1][col + 1] == player &&
-                board[row + 2][col + 2] == player &&
-                board[row + 3][col + 3] == player) {
+            if (tablero[fila][col] == jugador &&
+                tablero[fila + 1][col + 1] == jugador &&
+                tablero[fila + 2][col + 2] == jugador &&
+                tablero[fila + 3][col + 3] == jugador) {
                 return true;
             }
         }
@@ -79,9 +81,9 @@ bool checkWin(char board[6][7], char player) {
 }
 
 // Función para verificar si hay empate
-bool checkDraw(char board[6][7]) {
+bool verificarEmpate(char tablero[6][7]) {
     for (int col = 0; col < 7; ++col) {
-        if (board[5][col] == ' ') {
+        if (tablero[5][col] == ' ') {
             return false; // Todavía hay espacio en la columna, no hay empate
         }
     }
@@ -91,150 +93,150 @@ bool checkDraw(char board[6][7]) {
 int main(int argc, char const *argv[]) {
     // Verificar que se haya proporcionado la dirección IP y el puerto
     if (argc < 3) {
-        printf("Usage: %s <ip> <port>\n", argv[0]);
+        cout << "Usage: " << argv[0] << " <ip> <port>" << endl;
         return -1;
     }
 
     // Crear socket del cliente
-    int PORT = atoi(argv[2]);
-    int status, valread, client_fd;
+    int port = atoi(argv[2]);
+    int status, valread, socket_cliente;
     struct sockaddr_in serv_addr;
     char buffer[1024] = {0};
-    char message[1024];
+    char mensaje[1024];
 
     // Inicializar tablero
-    char board[6][7];
+    char tablero[6][7];
     for (int i = 0; i < 6; ++i) {
         for (int j = 0; j < 7; ++j) {
-            board[i][j] = ' ';
+            tablero[i][j] = ' ';
         }
     }
 
     // Crear socket del cliente
-    if ((client_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        printf("\n Socket creation error \n");
+    if ((socket_cliente = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+        cout << "\n Socket creation error \n" << endl;
         return -1;
     }
 
     // Configurar dirección del servidor
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
+    serv_addr.sin_port = htons(port);
 
     // Convertir dirección IP a binario
     if (inet_pton(AF_INET, argv[1], &serv_addr.sin_addr) <= 0) {
-        printf("\nInvalid address/ Address not supported \n");
+        cout << "\nInvalid address/ Address not supported \n" << endl;
         return -1;
     }
     // Conectar al servidor
-    if ((status = connect(client_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr))) < 0) {
-        printf("\nConnection Failed \n");
+    if ((status = connect(socket_cliente, (struct sockaddr *)&serv_addr, sizeof(serv_addr))) < 0) {
+        cout << "\nConnection Failed \n" << endl;
         return -1;
     }
 
-    std::cout << "Bienvenido al juego de 4 en linea" << std::endl; // Mensaje de bienvenida
-    std::cout << "Escribe c1,c2,c3,c4,c5,c6 o c7 para poner una ficha en una columna" << std::endl;
-    std::cout << "Escribe Q para salir del juego \n" << std::endl;
+    cout << "Bienvenido al juego de 4 en linea" << endl; // Mensaje de bienvenida
+    cout << "Escriba c1,c2,c3,c4,c5,c6 o c7 para poner una ficha en una columna" << endl;
+    cout << "Escriba Q para salir del juego \n" << endl;
 
     // Determinar de manera aleatoria quién comienza el juego
     srand(time(0)); // Inicializar la semilla para rand
-    bool serverStarts = rand() % 2 == 0;
+    bool servidorComienza = rand() % 2 == 0;
 
-    if (serverStarts) {
-        std::cout << "Servidor comienza" << std::endl;
-        send(client_fd, "start\n", 6, 0); // Enviar mensaje al servidor para que inicie el juego
-        valread = read(client_fd, buffer, 1024 - 1);
-        std::cout << "Movimiento del servidor: " << buffer << std::endl;
+    if (servidorComienza) {
+        cout << "Servidor comienza" << endl;
+        send(socket_cliente, "start\n", 6, 0); // Enviar mensaje al servidor para que inicie el juego
+        valread = read(socket_cliente, buffer, 1024 - 1);
+        cout << "Movimiento del servidor: " << buffer << endl;
 
-        int column_server = buffer[1] - '1';
+        int columna_servidor = buffer[1] - '1';
         for (int i = 0; i < 6; ++i) {
-            if (board[i][column_server] == ' ') {
-                board[i][column_server] = 'S';
+            if (tablero[i][columna_servidor] == ' ') {
+                tablero[i][columna_servidor] = 'S';
                 break;
             }
         }
 
-        printBoard(board);
+        imprimirTablero(tablero);
     } else {
-        std::cout << "Jugador comienza" << std::endl;
+        cout << "Jugador comienza" << endl;
     }
 
-    std::cout << "\n" << std::endl;
+    cout << "\n" << endl;
 
     // Juego
     while (1) {
-        printf("Escriba su movimiento: ");
-        fgets(message, 1024, stdin);
+        cout << "Escriba su movimiento: ";
+        fgets(mensaje, 1024, stdin);
 
         // Si el mensaje es 'Q', desconectar al cliente
-        if (message[0] == 'Q') {
-            printf("Client disconnected\n");
-            close(client_fd);
+        if (mensaje[0] == 'Q') {
+            cout << "Client disconnected" << endl;
+            close(socket_cliente);
             break;
         }
 
         // Si es q minúscula, se le notifica al usuario
-        if (message[0] == 'q') {
-            printf("Entrada inválida, ¿tal vez querias escribir Q?\n");
+        if (mensaje[0] == 'q') {
+            cout << "Entrada inválida, ¿tal vez queria escribir Q?" << endl;
             continue;
         }
 
         // Si el mensaje no es c1 a c7, se le notifica al usuario
-        if (message[1] < '1' || message[1] > '7') {
-            printf("Entrada inválida. Elige un número de columna entre 1 y 7.\n");
+        if (mensaje[1] < '1' || mensaje[1] > '7') {
+            cout << "Entrada inválida. Eliga un número de columna entre 1 y 7." << endl;
             continue;
         }
 
-        int column_client = message[1] - '1';
+        int columna_cliente = mensaje[1] - '1';
 
         // Verificar si la columna está llena
-        if (isColumnFull(board, column_client)) {
-            printf("Columna %d está llena. Elige otra columna.\n", column_client + 1);
+        if (columnaLlena(tablero, columna_cliente)) {
+            cout << "Columna " << columna_cliente + 1 << " está llena. Eliga otra columna." << endl;
             continue;
         }
 
         // Colocar ficha en la columna seleccionada
         for (int i = 0; i < 6; ++i) {
-            if (board[i][column_client] == ' ') {
-                board[i][column_client] = 'C';
+            if (tablero[i][columna_cliente] == ' ') {
+                tablero[i][columna_cliente] = 'C';
                 break;
             }
         }
 
         // Imprimir el tablero después del movimiento del cliente
-        printBoard(board);
+        imprimirTablero(tablero);
 
         // Enviar mensaje al servidor
-        send(client_fd, message, strlen(message), 0);
+        send(socket_cliente, mensaje, strlen(mensaje), 0);
 
         // Verificar si el cliente ha ganado
-        if (checkWin(board, 'C')) {
-            printf("\n¡Has ganado!\n");
+        if (verificarGanador(tablero, 'C')) {
+            cout << "\n¡Ha ganado!" << endl;
             break;
-        } else if (checkDraw(board)) {
-            printf("\n¡El juego está empatado!\n");
+        } else if (verificarEmpate(tablero)) {
+            cout << "\n¡El juego ha empatado!" << endl;
             break;
         }
 
-        valread = read(client_fd, buffer, 1024 - 1);
-        printf("Movimiento del servidor: %s\n", buffer);
+        valread = read(socket_cliente, buffer, 1024 - 1);
+        cout << "Movimiento del servidor: " << buffer << endl;
 
-        int column_server = buffer[1] - '1';
+        int columna_servidor = buffer[1] - '1';
         for (int i = 0; i < 6; ++i) {
-            if (board[i][column_server] == ' ') {
-                board[i][column_server] = 'S';
+            if (tablero[i][columna_servidor] == ' ') {
+                tablero[i][columna_servidor] = 'S';
                 break;
             }
         }
 
         // Imprimir el tablero después del movimiento del servidor
-        printBoard(board);
+        imprimirTablero(tablero);
 
         // Verificar si el servidor ha ganado
-        if (checkWin(board, 'S')) {
-            printf("\nEl servidor ha ganado!\n");
+        if (verificarGanador(tablero, 'S')) {
+            cout << "\nEl servidor ha ganado!" << endl;
             break;
-        } else if (checkDraw(board)) {
-            printf("\n¡El juego está empatado!\n");
+        } else if (verificarEmpate(tablero)) {
+            cout << "\n¡El juego ha empatado!" << endl;
             break;
         }
 
