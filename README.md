@@ -43,19 +43,40 @@ Si quieres salir puedes escribir la letra Q en mayuscula
 
 ## Ejemplo de juego
 
-Jugador comienza.
-
-
-Enter a message: c1 <br>
-Server response: c2
+* Si el jugador comienza se vera asi
 ```
+Bienvenido al juego de 4 en linea
+Escribe c1,c2,c3,c4,c5,c6 o c7 para poner una ficha en una columna
+Escribe Q para salir del juego 
+
+Jugador comienza
+
+
+Escriba su movimiento: 
+
+```
+
+* Si el servidor comienza se vera asi
+```
+Bienvenido al juego de 4 en linea
+Escribe c1,c2,c3,c4,c5,c6 o c7 para poner una ficha en una columna
+Escribe Q para salir del juego 
+
+Servidor comienza
+Movimiento del servidor: c2
+
 TABLERO
               
               
               
               
               
-C S           
+  S           
 -------------
 1 2 3 4 5 6 7
+
+
+Escriba su movimiento: 
+
 ```
+
