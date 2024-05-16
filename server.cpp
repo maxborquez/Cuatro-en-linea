@@ -35,12 +35,22 @@ void* jugar(void* args) {
             return NULL;
         }
 
-        // Colocar ficha en columna
+        if (strcmp(buffer, "start\n") == 0) {  // Manejar el inicio del juego
+            char server_move[4];
+            sprintf(server_move, "c%d\n", (rand() % 7) + 1); // Generar movimiento aleatorio del servidor
+            cout << "Movimiento del servidor: " << server_move << endl;
+            send(socket_cliente, server_move, strlen(server_move), 0);  // Responder con movimiento del servidor
+            continue;
+        }
+
+        // Servidor genera su movimiento aleatorio si el cliente envía un movimiento válido
         if (buffer[0] == 'c' && buffer[1] >= '1' && buffer[1] <= '7') {
-            cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Columna: " << buffer[1] << endl;
+            // imprimir movimiento del cliente y su ip
+            cout << "[" << ip << ":" << ntohs(direccionCliente.sin_port) << "] Movimiento del jugador: " << buffer[1] << endl;
 
             char server_move[4];
             sprintf(server_move, "c%d\n", (rand() % 7) + 1); // Generar movimiento aleatorio del servidor
+            cout << "Movimiento del servidor: " << server_move << endl;
             send(socket_cliente, server_move, strlen(server_move), 0);  // Responder con movimiento del servidor
         } else {
             send(socket_cliente, "error\n", 6, 0);  // Enviar mensaje de error si el comando es inválido.

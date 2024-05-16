@@ -4,7 +4,8 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <iostream>
-#include <ctype.h>
+#include <ctime> // Para srand y rand
+#include <cstdlib>
 
 // Función para imprimir el tablero
 void printBoard(char board[6][7]) {
@@ -131,15 +132,37 @@ int main(int argc, char const *argv[]) {
     }
 
     std::cout << "Bienvenido al juego de 4 en linea" << std::endl; // Mensaje de bienvenida
-    std::cout << "escribe c1,c2,c3,c4,c5,c6 o c7 para poner una ficha en una columna" << std::endl;
-    std::cout << "escribe Q para salir del juego \n" << std::endl;
+    std::cout << "Escribe c1,c2,c3,c4,c5,c6 o c7 para poner una ficha en una columna" << std::endl;
+    std::cout << "Escribe Q para salir del juego \n" << std::endl;
 
-    
+    // Determinar de manera aleatoria quién comienza el juego
+    srand(time(0)); // Inicializar la semilla para rand
+    bool serverStarts = rand() % 2 == 0;
+
+    if (serverStarts) {
+        std::cout << "Servidor comienza" << std::endl;
+        send(client_fd, "start\n", 6, 0); // Enviar mensaje al servidor para que inicie el juego
+        valread = read(client_fd, buffer, 1024 - 1);
+        std::cout << "Movimiento del servidor: " << buffer << std::endl;
+
+        int column_server = buffer[1] - '1';
+        for (int i = 0; i < 6; ++i) {
+            if (board[i][column_server] == ' ') {
+                board[i][column_server] = 'S';
+                break;
+            }
+        }
+
+        printBoard(board);
+    } else {
+        std::cout << "Jugador comienza" << std::endl;
+    }
+
     std::cout << "\n" << std::endl;
 
     // Juego
     while (1) {
-        printf("Enter a message: ");
+        printf("Escriba su movimiento: ");
         fgets(message, 1024, stdin);
 
         // Si el mensaje es 'Q', desconectar al cliente
@@ -193,7 +216,7 @@ int main(int argc, char const *argv[]) {
         }
 
         valread = read(client_fd, buffer, 1024 - 1);
-        printf("Server response: %s\n", buffer);
+        printf("Movimiento del servidor: %s\n", buffer);
 
         int column_server = buffer[1] - '1';
         for (int i = 0; i < 6; ++i) {
