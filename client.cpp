@@ -88,7 +88,6 @@ bool checkDraw(char board[6][7]) {
 }
 
 int main(int argc, char const *argv[]) {
-
     // Verificar que se haya proporcionado la dirección IP y el puerto
     if (argc < 3) {
         printf("Usage: %s <ip> <port>\n", argv[0]);
@@ -131,37 +130,36 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
-
-    std::cout<< "Bienvenido al juego de 4 en linea" << std::endl; // Mensaje de bienvenida
-    std::cout<< "escribe c1,c2,c3,c4,c5,c6 o c7 para poner una ficha en una columna" << std::endl;
-    std::cout<< "escribe Q para salir del juego \n" << std::endl;
+    std::cout << "Bienvenido al juego de 4 en linea" << std::endl; // Mensaje de bienvenida
+    std::cout << "escribe c1,c2,c3,c4,c5,c6 o c7 para poner una ficha en una columna" << std::endl;
+    std::cout << "escribe Q para salir del juego \n" << std::endl;
 
     // Leer mensaje de bienvenida del servidor
     valread = read(client_fd, buffer, 1024 - 1);
     printf("%s", buffer);
     memset(buffer, 0, sizeof(buffer));
 
-    std::cout<< "\n" << std::endl;
+    std::cout << "\n" << std::endl;
 
     // Juego
-    while(1) {
+    while (1) {
         printf("Enter a message: ");
         fgets(message, 1024, stdin);
 
         // Si el mensaje es 'Q', desconectar al cliente
-        if (message[0] == 'Q') { 
+        if (message[0] == 'Q') {
             printf("Client disconnected\n");
             close(client_fd);
             break;
         }
 
-        // si es q minuscual, se le notifica al usuario
+        // Si es q minúscula, se le notifica al usuario
         if (message[0] == 'q') {
             printf("Entrada inválida, ¿tal vez querias escribir Q?\n");
             continue;
         }
 
-        // si el mensaje no es c1 a c7, se le notifica al usuario
+        // Si el mensaje no es c1 a c7, se le notifica al usuario
         if (message[1] < '1' || message[1] > '7') {
             printf("Entrada inválida. Elige un número de columna entre 1 y 7.\n");
             continue;
@@ -183,21 +181,23 @@ int main(int argc, char const *argv[]) {
             }
         }
 
+        // Imprimir el tablero después del movimiento del cliente
+        printBoard(board);
+
         // Enviar mensaje al servidor
         send(client_fd, message, strlen(message), 0);
 
         // Verificar si el cliente ha ganado
         if (checkWin(board, 'C')) {
-            printBoard(board);
             printf("\n¡Has ganado!\n");
             break;
         } else if (checkDraw(board)) {
-            printBoard(board);
             printf("\n¡El juego está empatado!\n");
             break;
         }
 
         valread = read(client_fd, buffer, 1024 - 1);
+        printf("Server response: %s\n", buffer);
 
         int column_server = buffer[1] - '1';
         for (int i = 0; i < 6; ++i) {
@@ -207,20 +207,18 @@ int main(int argc, char const *argv[]) {
             }
         }
 
+        // Imprimir el tablero después del movimiento del servidor
+        printBoard(board);
+
         // Verificar si el servidor ha ganado
         if (checkWin(board, 'S')) {
-            printBoard(board);
             printf("\nEl servidor ha ganado!\n");
             break;
         } else if (checkDraw(board)) {
-            printBoard(board);
             printf("\n¡El juego está empatado!\n");
             break;
         }
 
-        // Imprimir tablero y respuesta del servidor
-        printf("Server response: %s\n", buffer);
-        printBoard(board);
         memset(buffer, 0, sizeof(buffer));
     }
 

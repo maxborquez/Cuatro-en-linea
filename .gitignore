@@ -1,0 +1,13 @@
+# Ignorar archivos y directorios de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos de compilación
+*.o
+*.exe
+*.out
+*.log
+
+# Ignorar archivos específicos del proyecto
+client
+server
